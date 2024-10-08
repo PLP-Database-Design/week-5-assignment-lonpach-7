@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient and Provider Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 400px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Search Patients</h1>
+    <div>
+        <input type="text" id="patientSearch" placeholder="Search by First Name">
+        <button onclick="searchPatients()">Search</button>
+    </div>
+    <table id="patientsTable">
+        <thead>
+            <tr>
+                <th>Patient ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Date of Birth</th>
+            </tr>
+        </thead>
+        <tbody id="patientsBody"></tbody>
+    </table>
+
+    <h1>Search Providers</h1>
+    <div>
+        <input type="text" id="providerSearch" placeholder="Search by Specialty">
+        <button onclick="searchProviders()">Search</button>
+    </div>
+    <table id="providersTable">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Provider Specialty</th>
+            </tr>
+        </thead>
+        <tbody id="providersBody"></tbody>
+    </table>
+
+    <script>
+        // Function to fetch and display patients
+        async function fetchPatients() {
+            const response = await fetch('http://localhost:3000/patients');
+            const patients = await response.json();
+            const patientsBody = document.getElementById('patientsBody');
+
+            // Clear existing rows
+            patientsBody.innerHTML = '';
+
+            // Populate table with patients data
+            patients.forEach(patient => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${patient.patient_id}</td>
+                    <td>${patient.first_name}</td>
+                    <td>${patient.last_name}</td>
+                    <td>${new Date(patient.date_of_birth).toLocaleDateString()}</td>
+                `;
+                patientsBody.appendChild(row);
+            });
+        }
+
+        // Function to fetch and display providers
+        async function fetchProviders() {
+            const response = await fetch('http://localhost:3000/providers');
+            const providers = await response.json();
+            const providersBody = document.getElementById('providersBody');
+
+            // Clear existing rows
+            providersBody.innerHTML = '';
+
+            // Populate table with providers data
+            providers.forEach(provider => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${provider.first_name}</td>
+                    <td>${provider.last_name}</td>
+                    <td>${provider.provider_specialty}</td>
+                `;
+                providersBody.appendChild(row);
+            });
+        }
+
+        // Function to search patients by first name
+        async function searchPatients() {
+            const firstName = document.getElementById('patientSearch').value;
+            const response = await fetch(`http://localhost:3000/patients/first-name/${firstName}`);
+            const patients = await response.json();
+            const patientsBody = document.getElementById('patientsBody');
+
+            // Clear existing rows
+            patientsBody.innerHTML = '';
+
+            // Populate table with filtered patients data
+            patients.forEach(patient => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${patient.patient_id}</td>
+                    <td>${patient.first_name}</td>
+                    <td>${patient.last_name}</td>
+                    <td>${new Date(patient.date_of_birth).toLocaleDateString()}</td>
+                `;
+                patientsBody.appendChild(row);
+            });
+        }
+
+        // Function to search providers by specialty
+        async function searchProviders() {
+            const specialty = document.getElementById('providerSearch').value;
+            const response = await fetch(`http://localhost:3000/providers/specialty/${specialty}`);
+            const providers = await response.json();
+            const providersBody = document.getElementById('providersBody');
+
+            // Clear existing rows
+            providersBody.innerHTML = '';
+
+            // Populate table with filtered providers data
+            providers.forEach(provider => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${provider.first_name}</td>
+                    <td>${provider.last_name}</td>
+                    <td>${provider.provider_specialty}</td>
+                `;
+                providersBody.appendChild(row);
+            });
+        }
+
+        // Fetch data on page load
+        window.onload = () => {
+            fetchPatients();
+            fetchProviders();
+        };
+    </script>
+</body>
+</html>
